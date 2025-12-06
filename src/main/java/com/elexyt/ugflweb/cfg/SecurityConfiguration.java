@@ -63,7 +63,7 @@ public class SecurityConfiguration {
 					public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 
 						CorsConfiguration cfg=new CorsConfiguration();
-						cfg.setAllowedOrigins(Arrays.asList("http://localhost:3000/","http://72.60.200.193/","https://elexyt2024.site/","http://elexyt2024.site/"));
+						cfg.setAllowedOrigins(Arrays.asList("http://localhost:3000/","http://localhost:5173/","http://72.60.200.193/","https://elexyt2024.site/","http://elexyt2024.site/"));
 						//cfg.setAllowedMethods(List.of(List.of("GET", "POST", "PUT", "DELETE", "PATCH").toArray(new String[0])));
                         cfg.setAllowedMethods(Collections.singletonList("*"));
                         cfg.setAllowCredentials(true);

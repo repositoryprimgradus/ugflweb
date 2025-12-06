@@ -3,6 +3,7 @@ package com.elexyt.ugflweb.controller;
 
 import com.elexyt.ugflweb.authentication.entity.Login;
 import com.elexyt.ugflweb.authentication.repository.LoginRepository;
+import com.elexyt.ugflweb.dto.GoldRateDaliyDTO;
 import com.elexyt.ugflweb.dto.PasswordChangeDto;
 import com.elexyt.ugflweb.dto.UserDto;
 import com.elexyt.ugflweb.dto.ValidateOtpDto;
@@ -15,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
+import tech.jhipster.web.util.ResponseUtil;
 
 import java.net.URI;
+import java.util.Optional;
 import java.util.Random;
 
 @RestController
@@ -165,6 +168,13 @@ public class UserResource {
                 .body(message);
     }
 
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Login> getUser(@PathVariable("username") String username) {
+        LOG.debug("REST request to get user : {}", username);
+        Optional<Login> login = userService.findByUsername(username);
+        return ResponseUtil.wrapOrNotFound(login);
+    }
 
     private static String generateOTP(int length) {
         String numbers = "1234567890";

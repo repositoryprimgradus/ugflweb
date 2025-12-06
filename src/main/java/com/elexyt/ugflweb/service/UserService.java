@@ -6,6 +6,7 @@ import com.elexyt.ugflweb.authentication.entity.Role;
 import com.elexyt.ugflweb.authentication.entity.RoleSecurity;
 import com.elexyt.ugflweb.authentication.repository.LoginRepository;
 import com.elexyt.ugflweb.authentication.repository.RoleRepository;
+import com.elexyt.ugflweb.dto.GoldRateDaliyDTO;
 import com.elexyt.ugflweb.dto.PasswordChangeDto;
 import com.elexyt.ugflweb.dto.UserDto;
 import com.elexyt.ugflweb.dto.ValidateOtpDto;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -28,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -204,6 +207,12 @@ if(validateOtp==null) {
         logger.info("Request to userDetails: {}",loginId);
         return loginRepository.findByLoginId(loginId);
 
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Login> findByUsername(String username) {
+
+        return loginRepository.findByUsername(username)!=null ? Optional.of(loginRepository.findByUsername(username)) : Optional.empty();
     }
 
 
