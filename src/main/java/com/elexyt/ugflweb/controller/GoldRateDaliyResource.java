@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -51,13 +52,13 @@ public class GoldRateDaliyResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<GoldRateDaliyDTO> createGoldRateDaliy(@Valid @RequestBody GoldRateDaliyDTO goldRateDaliyDTO)
+    public ResponseEntity<GoldRateDaliyDTO> createGoldRateDaliy(@Valid @RequestBody GoldRateDaliyDTO goldRateDaliyDTO, Authentication auth)
         throws URISyntaxException {
         LOG.debug("REST request to save GoldRateDaliy : {}", goldRateDaliyDTO);
         if (goldRateDaliyDTO.getGoldRateDaliyId() != null) {
             throw new BadRequestAlertException("A new goldRateDaliy cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        goldRateDaliyDTO = goldRateDaliyService.save(goldRateDaliyDTO);
+        goldRateDaliyDTO = goldRateDaliyService.save(goldRateDaliyDTO,auth.getName());
         return ResponseEntity.created(new URI("/api/gold-rate-daliys/" + goldRateDaliyDTO.getGoldRateDaliyId()))
             .headers(
                 HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, goldRateDaliyDTO.getGoldRateDaliyId().toString())
@@ -78,7 +79,7 @@ public class GoldRateDaliyResource {
     @PutMapping("/{goldRateDaliyId}")
     public ResponseEntity<GoldRateDaliyDTO> updateGoldRateDaliy(
         @PathVariable(value = "goldRateDaliyId", required = false) final String goldRateDaliyId,
-        @Valid @RequestBody GoldRateDaliyDTO goldRateDaliyDTO
+        @Valid @RequestBody GoldRateDaliyDTO goldRateDaliyDTO, Authentication auth
     ) throws URISyntaxException {
         LOG.debug("REST request to update GoldRateDaliy : {}, {}", goldRateDaliyId, goldRateDaliyDTO);
         if (goldRateDaliyDTO.getGoldRateDaliyId() == null) {
@@ -92,7 +93,7 @@ public class GoldRateDaliyResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        goldRateDaliyDTO = goldRateDaliyService.update(goldRateDaliyDTO);
+        goldRateDaliyDTO = goldRateDaliyService.update(goldRateDaliyDTO,auth.getName());
         return ResponseEntity.ok()
             .headers(
                 HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, goldRateDaliyDTO.getGoldRateDaliyId().toString())
@@ -114,7 +115,7 @@ public class GoldRateDaliyResource {
     @PatchMapping(value = "/{goldRateDaliyId}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<GoldRateDaliyDTO> partialUpdateGoldRateDaliy(
         @PathVariable(value = "goldRateDaliyId", required = false) final String goldRateDaliyId,
-        @NotNull @RequestBody GoldRateDaliyDTO goldRateDaliyDTO
+        @NotNull @RequestBody GoldRateDaliyDTO goldRateDaliyDTO, Authentication auth
     ) throws URISyntaxException {
         LOG.debug("REST request to partial update GoldRateDaliy partially : {}, {}", goldRateDaliyId, goldRateDaliyDTO);
         if (goldRateDaliyDTO.getGoldRateDaliyId() == null) {
@@ -128,7 +129,7 @@ public class GoldRateDaliyResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<GoldRateDaliyDTO> result = goldRateDaliyService.partialUpdate(goldRateDaliyDTO);
+        Optional<GoldRateDaliyDTO> result = goldRateDaliyService.partialUpdate(goldRateDaliyDTO,auth.getName());
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -173,5 +174,13 @@ public class GoldRateDaliyResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+
+    @GetMapping("/today-rate")
+    public ResponseEntity<GoldRateDaliyDTO> getGoldRateDaliyTodayRate() {
+        LOG.debug("REST request to get GoldRateDaliy");
+        Optional<GoldRateDaliyDTO> goldRateDaliyDTO = goldRateDaliyService.todayRate();
+        return ResponseUtil.wrapOrNotFound(goldRateDaliyDTO);
     }
 }

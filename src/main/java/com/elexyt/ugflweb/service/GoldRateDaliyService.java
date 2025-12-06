@@ -4,6 +4,7 @@ import com.elexyt.ugflweb.entity.GoldRateDaliy;
 import com.elexyt.ugflweb.repository.GoldRateDaliyRepository;
 import com.elexyt.ugflweb.dto.GoldRateDaliyDTO;
 import com.elexyt.ugflweb.mapper.GoldRateDaliyMapper;
+import com.elexyt.ugflweb.utility.AuditUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,11 +37,13 @@ public class GoldRateDaliyService {
      * Save a goldRateDaliy.
      *
      * @param goldRateDaliyDTO the entity to save.
+     * @param username
      * @return the persisted entity.
      */
-    public GoldRateDaliyDTO save(GoldRateDaliyDTO goldRateDaliyDTO) {
+    public GoldRateDaliyDTO save(GoldRateDaliyDTO goldRateDaliyDTO, String username) {
         LOG.debug("Request to save GoldRateDaliy : {}", goldRateDaliyDTO);
         GoldRateDaliy goldRateDaliy = goldRateDaliyMapper.toEntity(goldRateDaliyDTO);
+        AuditUtil.setCreated(username,goldRateDaliy);
         goldRateDaliy = goldRateDaliyRepository.save(goldRateDaliy);
         return goldRateDaliyMapper.toDto(goldRateDaliy);
     }
@@ -51,9 +54,10 @@ public class GoldRateDaliyService {
      * @param goldRateDaliyDTO the entity to save.
      * @return the persisted entity.
      */
-    public GoldRateDaliyDTO update(GoldRateDaliyDTO goldRateDaliyDTO) {
+    public GoldRateDaliyDTO update(GoldRateDaliyDTO goldRateDaliyDTO, String username) {
         LOG.debug("Request to update GoldRateDaliy : {}", goldRateDaliyDTO);
         GoldRateDaliy goldRateDaliy = goldRateDaliyMapper.toEntity(goldRateDaliyDTO);
+        AuditUtil.setModified(username,goldRateDaliy);
         goldRateDaliy = goldRateDaliyRepository.save(goldRateDaliy);
         return goldRateDaliyMapper.toDto(goldRateDaliy);
     }
@@ -64,14 +68,14 @@ public class GoldRateDaliyService {
      * @param goldRateDaliyDTO the entity to update partially.
      * @return the persisted entity.
      */
-    public Optional<GoldRateDaliyDTO> partialUpdate(GoldRateDaliyDTO goldRateDaliyDTO) {
+    public Optional<GoldRateDaliyDTO> partialUpdate(GoldRateDaliyDTO goldRateDaliyDTO, String username) {
         LOG.debug("Request to partially update GoldRateDaliy : {}", goldRateDaliyDTO);
 
         return goldRateDaliyRepository
             .findById(goldRateDaliyDTO.getGoldRateDaliyId())
             .map(existingGoldRateDaliy -> {
                 goldRateDaliyMapper.partialUpdate(existingGoldRateDaliy, goldRateDaliyDTO);
-
+                AuditUtil.setModified(username,existingGoldRateDaliy);
                 return existingGoldRateDaliy;
             })
             .map(goldRateDaliyRepository::save)
@@ -110,4 +114,14 @@ public class GoldRateDaliyService {
         LOG.debug("Request to delete GoldRateDaliy : {}", id);
         goldRateDaliyRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    public Optional<GoldRateDaliyDTO> todayRate() {
+
+        return goldRateDaliyRepository.findTodayOrLast().map(goldRateDaliyMapper::toDto);
+    }
+
+
+
+
 }
