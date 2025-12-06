@@ -44,5 +44,7 @@ public class WebMvcConfigruation{
 	     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
 	        return new PropertySourcesPlaceholderConfigurer();
 	     }
-	
+
+
+
 }

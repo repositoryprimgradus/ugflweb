@@ -105,6 +105,7 @@
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring6</artifactId>
         </dependency>
+
 	</dependencies>
 
 	<build>

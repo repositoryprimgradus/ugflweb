@@ -47,7 +47,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/job-applications").permitAll()
                 .requestMatchers("/api/loan-applications").permitAll()
                 .requestMatchers("/today-rate").permitAll()
-				//.requestMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**","/swagger-ui/**").permitAll()
+				.requestMatchers("/v2/api-docs","/v3/api-docs/**", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**","/swagger-ui/**").permitAll()
 				//.requestMatchers("/registerUser","/sendOtp", "/validateOtp", "/resetPassword", "/event-notice/eventNoticeList", "/event-notice/event-attachment-preview", "/active-member-details", "/uploads/**", "/gallery/all").permitAll()
 				.anyRequest()
 				.authenticated()
