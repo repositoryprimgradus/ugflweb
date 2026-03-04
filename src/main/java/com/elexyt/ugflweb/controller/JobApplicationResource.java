@@ -1,9 +1,15 @@
 package com.elexyt.ugflweb.controller;
 
+import com.elexyt.ugflweb.dto.ExperienceDTO;
+import com.elexyt.ugflweb.dto.EducationDTO;
 import com.elexyt.ugflweb.repository.JobApplicationRepository;
 import com.elexyt.ugflweb.service.JobApplicationService;
 import com.elexyt.ugflweb.dto.JobApplicationDTO;
 import com.elexyt.ugflweb.error.BadRequestAlertException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -14,8 +20,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -64,16 +70,16 @@ public class JobApplicationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<JobApplicationDTO> createJobApplication(@Valid @ModelAttribute JobApplicationDTO jobApplicationDTO)
+    public ResponseEntity<JobApplicationDTO> createJobApplication(@Valid @ModelAttribute JobApplicationDTO jobApplicationDTO, Authentication auth)
             throws URISyntaxException, IOException {
         LOG.debug("REST request to save JobApplication : {}", jobApplicationDTO);
         if (jobApplicationDTO.getJobApplicationId() != null) {
             throw new BadRequestAlertException("A new jobApplication cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        jobApplicationDTO = jobApplicationService.saveJobMultipart(jobApplicationDTO);
+        jobApplicationDTO = jobApplicationService.saveJobMultipart(jobApplicationDTO, auth.getName());
         return ResponseEntity.created(new URI("/api/job-applications/" + jobApplicationDTO.getJobApplicationId()))
             .headers(
-                HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, jobApplicationDTO.getJobApplicationId().toString())
+                HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, jobApplicationDTO.getJobApplicationId())
             )
             .body(jobApplicationDTO);
     }

@@ -33,7 +33,7 @@ public class LoanApplicationDTO implements Serializable {
     @Size(max = 255)
     private String address;
 
-
+    private LocalDateTime createdDate;
 
 
 }

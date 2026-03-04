@@ -31,5 +31,6 @@ public class FaqQueryDTO implements Serializable {
     @Size(max = 255)
     private String message;
 
+    private LocalDateTime createdDate;
 
 }

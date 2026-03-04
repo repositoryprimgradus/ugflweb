@@ -5,6 +5,7 @@ import com.elexyt.ugflweb.dto.FaqQueryDTO;
 import com.elexyt.ugflweb.entity.FaqQuery;
 import com.elexyt.ugflweb.mapper.FaqQueryMapper;
 import com.elexyt.ugflweb.repository.FaqQueryRepository;
+import com.elexyt.ugflweb.utility.AuditUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,11 +38,13 @@ public class FaqQueryService {
      * Save a faqQuery.
      *
      * @param faqQueryDTO the entity to save.
+     * @param username
      * @return the persisted entity.
      */
-    public FaqQueryDTO save(FaqQueryDTO faqQueryDTO) {
+    public FaqQueryDTO save(FaqQueryDTO faqQueryDTO, String username) {
         LOG.debug("Request to save FaqQuery : {}", faqQueryDTO);
         FaqQuery faqQuery = faqQueryMapper.toEntity(faqQueryDTO);
+        AuditUtil.setCreated(username, faqQuery);
         faqQuery.setIsActive(1);
         faqQuery = faqQueryRepository.save(faqQuery);
         return faqQueryMapper.toDto(faqQuery);
@@ -51,11 +54,13 @@ public class FaqQueryService {
      * Update a faqQuery.
      *
      * @param faqQueryDTO the entity to save.
+     * @param username
      * @return the persisted entity.
      */
-    public FaqQueryDTO update(FaqQueryDTO faqQueryDTO) {
+    public FaqQueryDTO update(FaqQueryDTO faqQueryDTO, String username) {
         LOG.debug("Request to update FaqQuery : {}", faqQueryDTO);
         FaqQuery faqQuery = faqQueryMapper.toEntity(faqQueryDTO);
+        AuditUtil.setModified(username, faqQuery);
         faqQuery = faqQueryRepository.save(faqQuery);
         return faqQueryMapper.toDto(faqQuery);
     }

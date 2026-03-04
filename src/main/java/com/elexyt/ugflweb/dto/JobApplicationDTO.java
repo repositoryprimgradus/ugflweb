@@ -1,12 +1,13 @@
 package com.elexyt.ugflweb.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * A DTO for the {@link com.elexyt.ugflweb.entity.JobApplication} entity.
@@ -45,7 +46,16 @@ public class JobApplicationDTO implements Serializable {
     @Size(max = 255)
     private String resumePath;
 
-    private MultipartFile file;
+    private String experiences;
+    private String higherStudies;
 
+    private MultipartFile file;
+    private LocalDateTime createdDate;
+
+    @JsonIgnore
+    private List<ExperienceDTO> experienceList;
+
+    @JsonIgnore
+    private List<EducationDTO> higherStudiesList;
 
 }
