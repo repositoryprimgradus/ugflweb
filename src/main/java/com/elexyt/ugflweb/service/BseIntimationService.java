@@ -84,4 +84,23 @@ public class BseIntimationService {
                 .map(bseIntimationMapper::toDto)
                 .collect(Collectors.toCollection(LinkedList::new));
     }
+
+    public void deleteBseIntimation(String id) throws IOException {
+        LOG.debug("Request to delete BseIntimation : {}", id);
+
+        BseIntimation bseIntimation = bseIntimationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("BSE Intimation record not found"));
+
+        // delete file if exists
+        if (bseIntimation.getFileName() != null) {
+            Path filePath = Paths.get(uploadPath, "bseIntimation", bseIntimation.getFileName());
+            LOG.debug("Deleting file: {}", filePath);
+
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            }
+        }
+
+        bseIntimationRepository.deleteById(id);
+    }
 }
