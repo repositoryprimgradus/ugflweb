@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -51,12 +52,12 @@ public class FaqQueryResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<FaqQueryDTO> createFaqQuery(@Valid @RequestBody FaqQueryDTO faqQueryDTO) throws URISyntaxException {
+    public ResponseEntity<FaqQueryDTO> createFaqQuery(@Valid @RequestBody FaqQueryDTO faqQueryDTO, Authentication auth) throws URISyntaxException {
         LOG.debug("REST request to save FaqQuery : {}", faqQueryDTO);
         if (faqQueryDTO.getFaqQueryId() != null) {
             throw new BadRequestAlertException("A new faqQuery cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        faqQueryDTO = faqQueryService.save(faqQueryDTO);
+        faqQueryDTO = faqQueryService.save(faqQueryDTO, auth.getName());
         return ResponseEntity.created(new URI("/api/faq-queries/" + faqQueryDTO.getFaqQueryId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, faqQueryDTO.getFaqQueryId().toString()))
             .body(faqQueryDTO);
@@ -75,7 +76,7 @@ public class FaqQueryResource {
     @PutMapping("/{faqQueryId}")
     public ResponseEntity<FaqQueryDTO> updateFaqQuery(
         @PathVariable(value = "faqQueryId", required = false) final String faqQueryId,
-        @Valid @RequestBody FaqQueryDTO faqQueryDTO
+        @Valid @RequestBody FaqQueryDTO faqQueryDTO, Authentication auth
     ) throws URISyntaxException {
         LOG.debug("REST request to update FaqQuery : {}, {}", faqQueryId, faqQueryDTO);
         if (faqQueryDTO.getFaqQueryId() == null) {
@@ -89,7 +90,7 @@ public class FaqQueryResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        faqQueryDTO = faqQueryService.update(faqQueryDTO);
+        faqQueryDTO = faqQueryService.update(faqQueryDTO, auth.getName());
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, faqQueryDTO.getFaqQueryId().toString()))
             .body(faqQueryDTO);

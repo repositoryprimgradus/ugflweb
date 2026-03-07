@@ -1,9 +1,15 @@
 package com.elexyt.ugflweb.controller;
 
+import com.elexyt.ugflweb.dto.ExperienceDTO;
+import com.elexyt.ugflweb.dto.EducationDTO;
 import com.elexyt.ugflweb.repository.JobApplicationRepository;
 import com.elexyt.ugflweb.service.JobApplicationService;
 import com.elexyt.ugflweb.dto.JobApplicationDTO;
 import com.elexyt.ugflweb.error.BadRequestAlertException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -11,11 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -64,16 +71,16 @@ public class JobApplicationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<JobApplicationDTO> createJobApplication(@Valid @ModelAttribute JobApplicationDTO jobApplicationDTO)
+    public ResponseEntity<JobApplicationDTO> createJobApplication(@Valid @ModelAttribute JobApplicationDTO jobApplicationDTO, Authentication auth)
             throws URISyntaxException, IOException {
         LOG.debug("REST request to save JobApplication : {}", jobApplicationDTO);
         if (jobApplicationDTO.getJobApplicationId() != null) {
             throw new BadRequestAlertException("A new jobApplication cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        jobApplicationDTO = jobApplicationService.saveJobMultipart(jobApplicationDTO);
+        jobApplicationDTO = jobApplicationService.saveJobMultipart(jobApplicationDTO, auth.getName());
         return ResponseEntity.created(new URI("/api/job-applications/" + jobApplicationDTO.getJobApplicationId()))
             .headers(
-                HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, jobApplicationDTO.getJobApplicationId().toString())
+                HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, jobApplicationDTO.getJobApplicationId())
             )
             .body(jobApplicationDTO);
     }
@@ -188,58 +195,20 @@ public class JobApplicationResource {
             .build();
     }
 
+    @GetMapping("/download-resume/{fileName}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) throws IOException {
 
+        Path filePath = Paths.get(uploadPath, "jobApplication", "resumes").resolve(fileName).normalize();
 
-//    @PostMapping(value = "/upload-resume",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<?> createJobApplicationWithFile(
-//            @ModelAttribute JobApplicationDTO jobApplicationDTO
-//    ) throws IOException, URISyntaxException {
-//        LOG.debug("REST request to save JobApplication with file : {}", jobApplicationDTO);
-//        if (jobApplicationDTO.getJobApplicationId() != null) {
-//            throw new BadRequestAlertException("A new jobApplication cannot already have an ID", ENTITY_NAME, "idexists");
-//        }
-//        jobApplicationDTO = jobApplicationService.saveJobMultipart(jobApplicationDTO);
-//        return ResponseEntity.created(new URI("/api/job-applications/" + jobApplicationDTO.getJobApplicationId()))
-//                .headers(
-//                        HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, jobApplicationDTO.getJobApplicationId().toString())
-//                )
-//                .body(jobApplicationDTO);
-//    }
+        Resource resource = new UrlResource(filePath.toUri());
 
-
-    @GetMapping("/{id}/download-resume")
-    public ResponseEntity<Resource> downloadResume(@PathVariable String id) throws IOException {
-        LOG.debug("REST request to get resume for id : {}", id);
-        String uploadDir = "jobApplication/resumes";
-        Path folderPath = Paths.get(uploadPath, uploadDir);
-
-        if (!Files.exists(folderPath)) {
+        if (!resource.exists()) {
             return ResponseEntity.notFound().build();
         }
-
-        File[] matchedFiles = folderPath.toFile().listFiles(
-                (dir, name) -> name.startsWith(id + "_")
-        );
-
-        if (matchedFiles == null || matchedFiles.length == 0) {
-            return ResponseEntity.notFound().build();
-        }
-
-        File file = matchedFiles[0];
-        Path filePath = file.toPath();
-
-        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(filePath));
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(
-                HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=" + file.getName()
-        );
 
         return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(file.length())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
     }
 

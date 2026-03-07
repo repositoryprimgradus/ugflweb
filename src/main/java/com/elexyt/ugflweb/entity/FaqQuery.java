@@ -24,7 +24,6 @@ public class FaqQuery implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "faq_query_id", nullable = false)

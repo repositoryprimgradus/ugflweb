@@ -1,9 +1,20 @@
 package com.elexyt.ugflweb.service;
 
+import com.elexyt.ugflweb.dto.EducationDTO;
+import com.elexyt.ugflweb.dto.ExperienceDTO;
+import com.elexyt.ugflweb.entity.Education;
+import com.elexyt.ugflweb.entity.Experience;
 import com.elexyt.ugflweb.entity.JobApplication;
+import com.elexyt.ugflweb.repository.EducationRepository;
+import com.elexyt.ugflweb.repository.ExperienceRepository;
 import com.elexyt.ugflweb.repository.JobApplicationRepository;
 import com.elexyt.ugflweb.dto.JobApplicationDTO;
 import com.elexyt.ugflweb.mapper.JobApplicationMapper;
+import com.elexyt.ugflweb.utility.AuditUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -36,9 +48,15 @@ public class JobApplicationService {
 
     private final JobApplicationMapper jobApplicationMapper;
 
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, JobApplicationMapper jobApplicationMapper) {
+    private final ExperienceRepository experienceRepository;
+
+    private final EducationRepository educationRepository;
+
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, JobApplicationMapper jobApplicationMapper, ExperienceRepository experienceRepository, EducationRepository educationRepository) {
         this.jobApplicationRepository = jobApplicationRepository;
         this.jobApplicationMapper = jobApplicationMapper;
+        this.experienceRepository = experienceRepository;
+        this.educationRepository = educationRepository;
     }
 
     /**
@@ -125,14 +143,54 @@ public class JobApplicationService {
         jobApplicationRepository.deleteById(id);
     }
 
-    public JobApplicationDTO saveJobMultipart(JobApplicationDTO jobApplicationDTO) throws IOException {
+    public JobApplicationDTO saveJobMultipart(JobApplicationDTO jobApplicationDTO, String name) throws IOException {
         LOG.debug("Request to save JobApplication with file: {}", jobApplicationDTO);
         MultipartFile file = jobApplicationDTO.getFile();
         JobApplication jobApplication = jobApplicationMapper.toEntity(jobApplicationDTO);
+        AuditUtil.setCreated(name, jobApplication);
         jobApplication.setIsActive(1);
         jobApplication = jobApplicationRepository.save(jobApplication);
 
         fileUpload(file, jobApplication);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        // Convert experience JSON → DTO
+        List<ExperienceDTO> experienceList =
+                objectMapper.readValue(
+                        jobApplicationDTO.getExperiences(),
+                        new TypeReference<List<ExperienceDTO>>() {}
+                );
+
+        // Save experiences
+        for (ExperienceDTO dto : experienceList) {
+            Experience exp = new Experience();
+            exp.setJobApplicationId(jobApplication.getJobApplicationId());
+            exp.setCompany(dto.getCompany());
+            exp.setDesignation(dto.getDesignation());
+            exp.setFromDate(dto.getFromDate());
+            exp.setToDate(dto.getToDate());
+            experienceRepository.save(exp);
+        }
+
+        // Convert education JSON → DTO
+        List<EducationDTO> educationList =
+                objectMapper.readValue(
+                        jobApplicationDTO.getHigherStudies(),
+                        new TypeReference<List<EducationDTO>>() {}
+                );
+
+        // Save education
+        for (EducationDTO dto : educationList) {
+            Education edu = new Education();
+            edu.setJobApplicationId(jobApplication.getJobApplicationId());
+            edu.setDegree(dto.getDegree());
+            edu.setInstitution(dto.getInstitution());
+            edu.setGraduationDate(dto.getGraduationDate());
+            educationRepository.save(edu);
+        }
 
         return jobApplicationMapper.toDto(jobApplication);
     }
@@ -160,5 +218,6 @@ public class JobApplicationService {
             jobApplicationRepository.save(jobApplication);
         }
     }
+
 
 }

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -51,13 +52,13 @@ public class LoanApplicationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<LoanApplicationDTO> createLoanApplication(@Valid @RequestBody LoanApplicationDTO loanApplicationDTO)
+    public ResponseEntity<LoanApplicationDTO> createLoanApplication(@Valid @RequestBody LoanApplicationDTO loanApplicationDTO, Authentication auth)
         throws URISyntaxException {
         LOG.debug("REST request to save LoanApplication : {}", loanApplicationDTO);
         if (loanApplicationDTO.getLoanApplicationId() != null) {
             throw new BadRequestAlertException("A new loanApplication cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        loanApplicationDTO = loanApplicationService.save(loanApplicationDTO);
+        loanApplicationDTO = loanApplicationService.save(loanApplicationDTO, auth.getName());
         return ResponseEntity.created(new URI("/api/loan-applications/" + loanApplicationDTO.getLoanApplicationId()))
             .headers(
                 HeaderUtil.createEntityCreationAlert(
