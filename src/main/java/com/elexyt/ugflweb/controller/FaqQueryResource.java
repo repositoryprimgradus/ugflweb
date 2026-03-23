@@ -52,12 +52,12 @@ public class FaqQueryResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<FaqQueryDTO> createFaqQuery(@Valid @RequestBody FaqQueryDTO faqQueryDTO, Authentication auth) throws URISyntaxException {
+    public ResponseEntity<FaqQueryDTO> createFaqQuery(@Valid @RequestBody FaqQueryDTO faqQueryDTO) throws URISyntaxException {
         LOG.debug("REST request to save FaqQuery : {}", faqQueryDTO);
         if (faqQueryDTO.getFaqQueryId() != null) {
             throw new BadRequestAlertException("A new faqQuery cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        faqQueryDTO = faqQueryService.save(faqQueryDTO, auth.getName());
+        faqQueryDTO = faqQueryService.save(faqQueryDTO);
         return ResponseEntity.created(new URI("/api/faq-queries/" + faqQueryDTO.getFaqQueryId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, faqQueryDTO.getFaqQueryId().toString()))
             .body(faqQueryDTO);
