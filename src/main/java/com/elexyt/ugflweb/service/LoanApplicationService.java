@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -38,13 +37,12 @@ public class LoanApplicationService {
      * Save a loanApplication.
      *
      * @param loanApplicationDTO the entity to save.
-     * @param name
      * @return the persisted entity.
      */
-    public LoanApplicationDTO save(LoanApplicationDTO loanApplicationDTO, String name) {
+    public LoanApplicationDTO save(LoanApplicationDTO loanApplicationDTO) {
         LOG.debug("Request to save LoanApplication : {}", loanApplicationDTO);
         LoanApplication loanApplication = loanApplicationMapper.toEntity(loanApplicationDTO);
-        AuditUtil.setCreated(name, loanApplication);
+        AuditUtil.setCreated(null, loanApplication);
         loanApplication.setIsActive(1);
         loanApplication = loanApplicationRepository.save(loanApplication);
         return loanApplicationMapper.toDto(loanApplication);

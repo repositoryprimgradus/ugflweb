@@ -37,13 +37,12 @@ public class GoldRateDaliyService {
      * Save a goldRateDaliy.
      *
      * @param goldRateDaliyDTO the entity to save.
-     * @param username
      * @return the persisted entity.
      */
-    public GoldRateDaliyDTO save(GoldRateDaliyDTO goldRateDaliyDTO, String username) {
+    public GoldRateDaliyDTO save(GoldRateDaliyDTO goldRateDaliyDTO) {
         LOG.debug("Request to save GoldRateDaliy : {}", goldRateDaliyDTO);
         GoldRateDaliy goldRateDaliy = goldRateDaliyMapper.toEntity(goldRateDaliyDTO);
-        AuditUtil.setCreated(username,goldRateDaliy);
+        AuditUtil.setCreated(null,goldRateDaliy);
         goldRateDaliy.setIsActive(1);
         goldRateDaliy = goldRateDaliyRepository.save(goldRateDaliy);
         return goldRateDaliyMapper.toDto(goldRateDaliy);

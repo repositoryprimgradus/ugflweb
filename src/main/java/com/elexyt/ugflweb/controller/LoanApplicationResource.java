@@ -52,13 +52,13 @@ public class LoanApplicationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<LoanApplicationDTO> createLoanApplication(@Valid @RequestBody LoanApplicationDTO loanApplicationDTO, Authentication auth)
+    public ResponseEntity<LoanApplicationDTO> createLoanApplication(@Valid @RequestBody LoanApplicationDTO loanApplicationDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save LoanApplication : {}", loanApplicationDTO);
         if (loanApplicationDTO.getLoanApplicationId() != null) {
             throw new BadRequestAlertException("A new loanApplication cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        loanApplicationDTO = loanApplicationService.save(loanApplicationDTO, auth.getName());
+        loanApplicationDTO = loanApplicationService.save(loanApplicationDTO);
         return ResponseEntity.created(new URI("/api/loan-applications/" + loanApplicationDTO.getLoanApplicationId()))
             .headers(
                 HeaderUtil.createEntityCreationAlert(
