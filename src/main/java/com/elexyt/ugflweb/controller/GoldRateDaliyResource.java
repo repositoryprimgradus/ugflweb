@@ -52,13 +52,13 @@ public class GoldRateDaliyResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<GoldRateDaliyDTO> createGoldRateDaliy(@Valid @RequestBody GoldRateDaliyDTO goldRateDaliyDTO, Authentication auth)
+    public ResponseEntity<GoldRateDaliyDTO> createGoldRateDaliy(@Valid @RequestBody GoldRateDaliyDTO goldRateDaliyDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save GoldRateDaliy : {}", goldRateDaliyDTO);
         if (goldRateDaliyDTO.getGoldRateDaliyId() != null) {
             throw new BadRequestAlertException("A new goldRateDaliy cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        goldRateDaliyDTO = goldRateDaliyService.save(goldRateDaliyDTO,auth.getName());
+        goldRateDaliyDTO = goldRateDaliyService.save(goldRateDaliyDTO);
         return ResponseEntity.created(new URI("/api/gold-rate-daliys/" + goldRateDaliyDTO.getGoldRateDaliyId()))
             .headers(
                 HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, goldRateDaliyDTO.getGoldRateDaliyId().toString())

@@ -100,4 +100,16 @@ public class BseIntimationResource {
                 .body(resource);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBseIntimation(@PathVariable String id) throws IOException {
+
+        LOG.debug("REST request to delete BseIntimation : {}", id);
+
+        bseIntimationService.deleteBseIntimation(id);
+
+        return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id))
+                .build();
+    }
+
 }

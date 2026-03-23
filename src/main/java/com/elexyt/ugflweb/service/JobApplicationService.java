@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -143,11 +142,11 @@ public class JobApplicationService {
         jobApplicationRepository.deleteById(id);
     }
 
-    public JobApplicationDTO saveJobMultipart(JobApplicationDTO jobApplicationDTO, String name) throws IOException {
+    public JobApplicationDTO saveJobMultipart(JobApplicationDTO jobApplicationDTO) throws IOException {
         LOG.debug("Request to save JobApplication with file: {}", jobApplicationDTO);
         MultipartFile file = jobApplicationDTO.getFile();
         JobApplication jobApplication = jobApplicationMapper.toEntity(jobApplicationDTO);
-        AuditUtil.setCreated(name, jobApplication);
+        AuditUtil.setCreated(null, jobApplication);
         jobApplication.setIsActive(1);
         jobApplication = jobApplicationRepository.save(jobApplication);
 

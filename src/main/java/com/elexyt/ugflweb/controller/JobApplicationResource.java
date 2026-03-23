@@ -71,13 +71,13 @@ public class JobApplicationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping(value = "",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<JobApplicationDTO> createJobApplication(@Valid @ModelAttribute JobApplicationDTO jobApplicationDTO, Authentication auth)
+    public ResponseEntity<JobApplicationDTO> createJobApplication(@Valid @ModelAttribute JobApplicationDTO jobApplicationDTO)
             throws URISyntaxException, IOException {
         LOG.debug("REST request to save JobApplication : {}", jobApplicationDTO);
         if (jobApplicationDTO.getJobApplicationId() != null) {
             throw new BadRequestAlertException("A new jobApplication cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        jobApplicationDTO = jobApplicationService.saveJobMultipart(jobApplicationDTO, auth.getName());
+        jobApplicationDTO = jobApplicationService.saveJobMultipart(jobApplicationDTO);
         return ResponseEntity.created(new URI("/api/job-applications/" + jobApplicationDTO.getJobApplicationId()))
             .headers(
                 HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, jobApplicationDTO.getJobApplicationId())

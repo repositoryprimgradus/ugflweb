@@ -38,13 +38,12 @@ public class FaqQueryService {
      * Save a faqQuery.
      *
      * @param faqQueryDTO the entity to save.
-     * @param username
      * @return the persisted entity.
      */
-    public FaqQueryDTO save(FaqQueryDTO faqQueryDTO, String username) {
+    public FaqQueryDTO save(FaqQueryDTO faqQueryDTO) {
         LOG.debug("Request to save FaqQuery : {}", faqQueryDTO);
         FaqQuery faqQuery = faqQueryMapper.toEntity(faqQueryDTO);
-        AuditUtil.setCreated(username, faqQuery);
+        AuditUtil.setCreated(null, faqQuery);
         faqQuery.setIsActive(1);
         faqQuery = faqQueryRepository.save(faqQuery);
         return faqQueryMapper.toDto(faqQuery);
