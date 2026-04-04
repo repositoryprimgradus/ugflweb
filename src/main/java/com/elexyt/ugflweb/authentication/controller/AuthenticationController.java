@@ -1,9 +1,12 @@
 package com.elexyt.ugflweb.authentication.controller;
 
 
+import com.elexyt.ugflweb.authentication.entity.Login;
+import com.elexyt.ugflweb.authentication.entity.RoleSecurity;
 import com.elexyt.ugflweb.authentication.model.AuthenticationRequest;
 import com.elexyt.ugflweb.authentication.model.AuthenticationResponse;
 import com.elexyt.ugflweb.cfg.JwtUtil;
+import com.elexyt.ugflweb.service.UserService;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 @RestController
 public class AuthenticationController {
@@ -28,7 +32,8 @@ public class AuthenticationController {
 
 	@Autowired
 	private UserDetailsService userDetailsService;
-
+    @Autowired
+    private  UserService userService;
 
 	@Autowired
 	private JwtUtil jwtUtil;
@@ -49,7 +54,16 @@ public class AuthenticationController {
 		
 		UserDetails userdetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 		String token = jwtUtil.generateToken(userdetails);
-		return ResponseEntity.ok(new AuthenticationResponse(token));
+        Optional<Login> login = userService.findByUsername(userdetails.getUsername());
+        // Safely extract the first role's roleName if present; otherwise null
+        String roleName = login.flatMap(l -> {
+            if (l.getRoleSecurity() == null || l.getRoleSecurity().isEmpty()) {
+                return Optional.empty();
+            }
+            return l.getRoleSecurity().stream().findFirst().map(RoleSecurity::getRoleName);
+        }).orElse(null);
+
+        return ResponseEntity.ok(new AuthenticationResponse(token, roleName));
 	}
 	
 
@@ -61,7 +75,8 @@ public class AuthenticationController {
 
 		Map<String, Object> expectedMap = getMapFromIoJsonwebtokenClaims(claims);
 		String token = jwtUtil.doGenerateRefreshToken(expectedMap, expectedMap.get("sub").toString());
-		return ResponseEntity.ok(new AuthenticationResponse(token));
+		// AuthenticationResponse expects (token, roleName) — roleName not available here
+		return ResponseEntity.ok(new AuthenticationResponse(token, null));
 	}
 
 
@@ -84,7 +99,7 @@ public class AuthenticationController {
 //
 //	}
 //
-
+//
 
 
 	public Map<String, Object> getMapFromIoJsonwebtokenClaims(DefaultClaims claims) {
@@ -98,3 +113,5 @@ public class AuthenticationController {
 
 
 }
+
+

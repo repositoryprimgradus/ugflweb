@@ -40,10 +40,18 @@ public class JwtUtil {
 		if (roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
 			claims.put("isAdmin", true);
 		}
-		if (roles.contains(new SimpleGrantedAuthority("ROLE_USER"))) {
-			claims.put("isUser", true);
+		if (roles.contains(new SimpleGrantedAuthority("ROLE_CRM"))) {
+			claims.put("isCrm", true);
 		}
-
+        if (roles.contains(new SimpleGrantedAuthority("ROLE_HR"))) {
+            claims.put("isHr", true);
+        }
+        if (roles.contains(new SimpleGrantedAuthority("ROLE_BUSINESS"))) {
+            claims.put("isBusiness", true);
+        }
+        if (roles.contains(new SimpleGrantedAuthority("ROLE_IT"))) {
+            claims.put("isIt", true);
+        }
 		
 		return doGenerateToken(claims, userDetails.getUsername());
 	}
@@ -86,7 +94,11 @@ public class JwtUtil {
 		List<SimpleGrantedAuthority> roles = null;
 
 		Boolean isAdmin = claims.get("isAdmin", Boolean.class);
-		Boolean isEmp = claims.get("isUser", Boolean.class);
+        Boolean isCrm = claims.get("isCrm", Boolean.class);
+        Boolean isHr = claims.get("isHr", Boolean.class);
+        Boolean isBusiness = claims.get("isBusiness", Boolean.class);
+        Boolean isIt = claims.get("isIt", Boolean.class);
+
 
 		
 		
@@ -95,10 +107,18 @@ public class JwtUtil {
 		if (isAdmin != null && isAdmin) {
 			roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
 		}
-
-		if (isEmp != null && isEmp) {
-			roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
-		}
+        if (isCrm != null && isCrm) {
+            roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_CRM"));
+        }
+        if (isHr != null && isHr) {
+            roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_HR"));
+        }
+        if (isBusiness != null && isBusiness) {
+            roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_BUSINESS"));
+        }
+        if (isIt != null && isIt) {
+            roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_IT"));
+        }
 
 		return roles;
 
