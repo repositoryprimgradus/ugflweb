@@ -36,6 +36,10 @@ public class JobApplication implements Serializable {
     @Column(name = "email", length = 255)
     private String email;
 
+    @NotNull
+    @Column(name = "phone", nullable = false)
+    private Long phone;
+
     @Size(max = 255)
     @Column(name = "city", length = 255)
     private String city;

@@ -25,6 +25,9 @@ public class JobApplicationDTO implements Serializable {
     @Size(max = 255)
     private String email;
 
+    @NotNull
+    private Long phone;
+
     @Size(max = 255)
     private String city;
 
