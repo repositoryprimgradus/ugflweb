@@ -122,7 +122,7 @@ if(validateOtp==null) {
             loginRepository.save(login);
 
         }else{
-            throw new Exception("Invalid OTP");
+            return "Invalid OTP";
         }
         return "Password changed successfully";
     }

@@ -47,6 +47,8 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST,"/api/faq-queries").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/job-applications").permitAll()
                 .requestMatchers(HttpMethod.POST,"/api/loan-applications").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/user/changePasswordOtp").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/user/validateOtp").permitAll()
 				.requestMatchers(HttpMethod.GET,"/api/gold-rate-daliys/today-rate").permitAll()
 				.requestMatchers(HttpMethod.GET,"/api/bse-intimation/**").permitAll()
 				.requestMatchers("/v2/api-docs","/v3/api-docs/**", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**","/swagger-ui/**").permitAll()
@@ -65,7 +67,7 @@ public class SecurityConfiguration {
 					public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 
 						CorsConfiguration cfg=new CorsConfiguration();
-						cfg.setAllowedOrigins(Arrays.asList("https://unigoldfinance.com/","https://unigoldfinance.com/api/","http://72.60.200.193/","https://www.unigoldfinance.com/"));
+						cfg.setAllowedOrigins(Arrays.asList("https://unigoldfinance.com/","https://unigoldfinance.com/api/","https://www.unigoldfinance.com/"));
 						//cfg.setAllowedMethods(List.of(List.of("GET", "POST", "PUT", "DELETE", "PATCH").toArray(new String[0])));
                         cfg.setAllowedMethods(Collections.singletonList("*"));
                         cfg.setAllowCredentials(true);
