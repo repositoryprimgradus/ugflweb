@@ -51,6 +51,7 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST,"/api/user/validateOtp").permitAll()
 				.requestMatchers(HttpMethod.GET,"/api/gold-rate-daliys/today-rate").permitAll()
 				.requestMatchers(HttpMethod.GET,"/api/bse-intimation/**").permitAll()
+				.requestMatchers(HttpMethod.GET,"/api/annual-reports/**").permitAll()
 				.requestMatchers("/v2/api-docs","/v3/api-docs/**", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**","/swagger-ui/**").permitAll()
 				//.requestMatchers("/registerUser","/sendOtp", "/validateOtp", "/resetPassword", "/event-notice/eventNoticeList", "/event-notice/event-attachment-preview", "/active-member-details", "/uploads/**", "/gallery/all").permitAll()
 				.anyRequest()
